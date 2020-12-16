@@ -1,0 +1,42 @@
+version: "3.7"
+
+services:
+  server:
+    build: ./server
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./server/:/usr/src/app/
+    ports:
+      - 8000:8000
+    env_file:
+      - ./server/.env.dev
+    depends_on:
+      - products-db
+  products-db:
+    image: postgres:12-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=products
+      - POSTGRES_PASSWORD=products
+      - POSTGRES_DB=products_dev
+  client:
+    build:
+      context: ./frontend
+    # command: yarn start
+    env_file:
+      - ./frontend/.env.dev
+    container_name: client
+    depends_on:
+      - server
+    ports:
+      - 8001:8001
+    stdin_open: true
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    environment: #live reload
+      - CHOKIDAR_USEPOLLING=true
+      - DEV_HOST=http://localhost:8000
+volumes:
+  postgres_data:

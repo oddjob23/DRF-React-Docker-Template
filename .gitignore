@@ -1,0 +1,8 @@
+__pycache__
+env
+*.sqlite3
+.env.dev
+server/.env.dev
+server/.env.prod
+*/.env.dev
+frontend/build
